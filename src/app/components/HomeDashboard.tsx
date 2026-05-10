@@ -5,9 +5,16 @@ import { useState } from "react";
 interface HomeDashboardProps {
   onStartEstimation: (area: number) => void;
   onNavigate: (screen: string) => void;
+  hasUsedFreeEstimate: boolean;
+  isSubscribed: boolean;
 }
 
-export function HomeDashboard({ onStartEstimation, onNavigate }: HomeDashboardProps) {
+export function HomeDashboard({
+  onStartEstimation,
+  onNavigate,
+  hasUsedFreeEstimate,
+  isSubscribed,
+}: HomeDashboardProps) {
   const [area, setArea] = useState("");
 
   const handleStart = () => {
@@ -44,6 +51,21 @@ export function HomeDashboard({ onStartEstimation, onNavigate }: HomeDashboardPr
           className="bg-white/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl shadow-orange-500/10 mb-6"
         >
           <h3 className="text-xl text-[#3A3A3A] mb-4" style={{ fontWeight: 600 }}>Start New Estimation</h3>
+
+          <div className="mb-4 rounded-2xl px-4 py-3 bg-[#F7F3EE] border border-[#E7DDD2]">
+            <p className="text-[#3A3A3A]" style={{ fontWeight: 500 }}>
+              {isSubscribed
+                ? "Premium plan active: you can create unlimited estimates."
+                : hasUsedFreeEstimate
+                  ? "Your free estimate has been used. Subscribe to unlock more calculations."
+                  : "Your first construction cost calculation is free."}
+            </p>
+            {!isSubscribed && (
+              <p className="text-sm text-[#7A7A7A] mt-1" style={{ fontWeight: 300 }}>
+                This supports the business model for your entrepreneurship course project.
+              </p>
+            )}
+          </div>
 
           <div className="mb-4">
             <label className="block text-[#7A7A7A] mb-2" style={{ fontWeight: 500 }}>House Area (sq ft)</label>

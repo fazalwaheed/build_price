@@ -7,8 +7,9 @@ import { MaterialSelection } from "./components/MaterialSelection";
 import { CostCalculation } from "./components/CostCalculation";
 import { ReportScreen } from "./components/ReportScreen";
 import { ProfileScreen } from "./components/ProfileScreen";
+import { SubscriptionScreen } from "./components/SubscriptionScreen";
 
-type Screen = "splash" | "onboarding" | "auth" | "home" | "materials" | "calculation" | "report" | "profile";
+type Screen = "splash" | "onboarding" | "auth" | "home" | "materials" | "calculation" | "report" | "profile" | "subscription";
 
 interface Material {
   id: string;
@@ -23,8 +24,15 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("splash");
   const [houseArea, setHouseArea] = useState<number>(0);
   const [selectedMaterials, setSelectedMaterials] = useState<Material[]>([]);
+  const [freeEstimateUsed, setFreeEstimateUsed] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const handleStartEstimation = (area: number) => {
+    if (freeEstimateUsed && !isSubscribed) {
+      setCurrentScreen("subscription");
+      return;
+    }
+
     setHouseArea(area);
     setCurrentScreen("materials");
   };
@@ -32,6 +40,19 @@ export default function App() {
   const handleMaterialsComplete = (materials: Material[]) => {
     setSelectedMaterials(materials);
     setCurrentScreen("calculation");
+  };
+
+  const handleViewReport = () => {
+    if (!freeEstimateUsed) {
+      setFreeEstimateUsed(true);
+    }
+
+    setCurrentScreen("report");
+  };
+
+  const handleSubscribe = () => {
+    setIsSubscribed(true);
+    setCurrentScreen("home");
   };
 
   return (
@@ -52,6 +73,8 @@ export default function App() {
         <HomeDashboard
           onStartEstimation={handleStartEstimation}
           onNavigate={(screen) => setCurrentScreen(screen as Screen)}
+          hasUsedFreeEstimate={freeEstimateUsed}
+          isSubscribed={isSubscribed}
         />
       )}
 
@@ -67,7 +90,7 @@ export default function App() {
         <CostCalculation
           materials={selectedMaterials}
           onBack={() => setCurrentScreen("materials")}
-          onViewReport={() => setCurrentScreen("report")}
+          onViewReport={handleViewReport}
         />
       )}
 
@@ -81,6 +104,13 @@ export default function App() {
 
       {currentScreen === "profile" && (
         <ProfileScreen onBack={() => setCurrentScreen("home")} />
+      )}
+
+      {currentScreen === "subscription" && (
+        <SubscriptionScreen
+          onBack={() => setCurrentScreen("home")}
+          onSubscribe={handleSubscribe}
+        />
       )}
     </div>
   );
